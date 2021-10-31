@@ -29,3 +29,19 @@ Pola arsitektur pada perancangan perangkat lunak berorientasi objek dengan tujua
 - app : Folder yang menyimpan file **MVC**
 - core : yang akan mengelola inti dari mvc
 
+```bash
+	.
+	├── app
+	│  ├── controllers
+	│  ├── core
+	├── ...
+	│  ├── models
+	│  ├── views
+	│	
+	├── public
+	│  ├── css
+	│  ├── js
+	│  ├── img
+
+```
+
