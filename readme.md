@@ -25,5 +25,7 @@ Pola arsitektur pada perancangan perangkat lunak berorientasi objek dengan tujua
 ## Apa yang dibuat pada projek ini
 
 ### Struktur Folder
-- Public : Folder yang akan diakses oleh user
+- public : Folder yang akan diakses oleh user
+- app : Folder yang menyimpan file **MVC**
+- core : yang akan mengelola inti dari mvc
 
