@@ -1,7 +1,8 @@
+![MVC dari WPU](./assets/banner.png)
 # MVC
+## Pengertian MVC
 Pola arsitektur pada perancangan perangkat lunak berorientasi objek dengan tujuan untuk memisahkan antara **tampilan**, **data** dan **proses**.
 
-## Pengertian MVC
 ### Model
 - Representasi Pengetahuan
 - Mengelola Data
