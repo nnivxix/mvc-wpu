@@ -23,5 +23,8 @@
         "psr-4": {
             "Hanasa\\MVC\\": "tests"
         }
+    },
+    "scripts": {
+        "serve": "cd public php -S localhost:8989"
     }
 }
