@@ -1,6 +1,6 @@
 <?php
 
-namespace Hanasa\MVC\App;
+namespace Hanasa\MVC\Helper;
 
 class Router
 {
