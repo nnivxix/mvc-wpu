@@ -9,3 +9,22 @@
 ## Middleware
 
 Middleware merupakan bagian kode yang dieksekusi sebelum `Controller` dieksekusi, contohnya seperti pengecekan apakah pengguna sudah login atau belum.
+
+## Local domain
+
+Terkadang kita bosan dengan nama yang kita akses dengan nama `localhost`, tetapi kita bisas mengganti namanya dengan nama domain yang kita inginkan
+
+|OS|Directory|
+|---|-------|
+|Mac atau Linux| `:/etc/hosts`|
+|Windows | `C:\Windows\System32\drivers\etc`|
+
+Tambahkan di file `hosts` 
+
+```plain text
+127.0.0.1 hana.sa
+```
+
+Untuk mengaksesnya jangan menggunakan ~~localhost~~ tapi dengan `127.0.0.1`
+
+`php -S 127.0.0.1:8989`

@@ -25,6 +25,6 @@
         }
     },
     "scripts": {
-        "serve": "cd public && php -S localhost:8989"
+        "serve": "cd public && php -S 127.0.0.1:8989"
     }
 }
