@@ -6,13 +6,16 @@ class Router
 {
   private static array $routes = [];
 
-  public static function add(string $method, string $path, string $controller, string $function)
+  public static function add(
+    string $method, string $path, string $controller,
+    string $function, array $middlewares = []) :void
   {
     self::$routes[] = [
       'method' => $method,
       'path' => $path,
       'controller' => $controller,
-      'function' => $function
+      'function' => $function,
+      'middleware' => $middlewares
     ];
   }
 
@@ -32,7 +35,10 @@ class Router
         $function = $route['function'];
         $controller = new $route['controller'];
         // $controller->$function();
-        
+        foreach ($route['middleware'] as $middleware) {
+          $instance = new $middleware;
+          $instance->before();
+        }
         array_shift($var);
         call_user_func_array([$controller, $function], $var);
 
