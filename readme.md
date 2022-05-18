@@ -57,3 +57,7 @@ Kemudian Buka file host di `C:\Windows\System32\drivers\etc`
 ```
 
 Namun itu semua mempunyai prilaku yang berbeda ketika menjalankan php seperti biasa dan mempunyai configurasi di `.htaccess` dan silakan buat configurasinya dari [repo CodeIgniter 4](https://github.com/codeigniter4/CodeIgniter4/blob/v4.1.3/public/.htaccess).
+
+# ⚠ Update
+
+Untuk meng-update project silahkan panggil perintah `composer update` kemudian `composer dump-autoload`;

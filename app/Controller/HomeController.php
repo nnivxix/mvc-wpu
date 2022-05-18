@@ -1,12 +1,14 @@
 <?php
 
 namespace Hanasa\MVC\Controller;
-use Hanasa\MVC\Helper\Template;
+
+use Hanasa\MVC\App\View;
 
 class HomeController
 {
-  function index(){
-    Template::render('Home/index', [
+  function index() :void
+  {
+    View::render('Home/index', [
       "title" => "PHP Login Management"
     ]);
   }
