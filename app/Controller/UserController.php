@@ -5,6 +5,7 @@ namespace Hanasa\MVC\Controller;
 use Hanasa\MVC\App\View;
 use Hanasa\MVC\Config\Database;
 use Hanasa\MVC\Exception\ValidateException;
+use Hanasa\MVC\Model\UserLoginRequest;
 use Hanasa\MVC\Model\UserRegisterRequest;
 use Hanasa\MVC\Repository\UserRepository;
 use Hanasa\MVC\Service\UserService;
@@ -44,6 +45,33 @@ class UserController
         'error' => $exception->getMessage()
       ]);
     }
+  }
+
+  public function login()
+  {
+    View::render('User/login', [
+      "title" => "Login User"
+    ]);
+  }
+
+  public function postLogin()
+  {
+    $request = new UserLoginRequest();
+    $request->id = $_POST['id'];
+    $request->pswd = $_POST['password'];
+
     
+
+    // mari kita cek
+
+    try {
+      $this->userService->login($request);
+      View::redirect('/');
+    } catch (ValidateException $exception) {
+      View::render('User/login', [
+        'title' => 'Login user',
+        'error' => $exception->getMessage()
+      ]);
+    }
   }
 }

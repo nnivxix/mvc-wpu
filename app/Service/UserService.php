@@ -8,6 +8,9 @@ use Hanasa\MVC\Model\UserRegisterRequest;
 use Hanasa\MVC\Model\UserRegisterResponse;
 use Hanasa\MVC\Repository\UserRepository;
 use Hanasa\MVC\Exception\ValidateException;
+use Hanasa\MVC\Model\UserLoginRequest;
+use Hanasa\MVC\Model\UserLoginResponse;
+
 
 class UserService
 {
@@ -55,6 +58,35 @@ class UserService
   {
     if ($request->id == null || $request->name == null || $request->pswd == null || trim($request->id) == "" || trim($request->name) == "" || trim($request->pswd) == "") {
       throw new ValidateException("id, name, password can not blank");
+    }
+  }
+
+  public function login(UserLoginRequest $request) : UserLoginResponse
+  {
+    $this->validateUserLoginRequest($request);
+
+    $user = $this->userRepository->findById($request->id);
+
+    if ($user == null) {
+      throw new ValidateException("Id or password is wrong");
+    }
+
+    if (password_verify($request->pswd, $user->pswd)) {
+      $response = new UserLoginResponse();
+      $response->user = $user;
+      return $response;
+    } else {
+      throw new ValidateException("Id or password is wrong");
+    }
+  }
+
+  private function validateUserLoginRequest(UserLoginRequest $request)
+  {
+    if ($request->id == null ||
+    $request->pswd == null ||
+    trim($request->id) == "" ||
+    trim($request->pswd) == "") {
+      throw new ValidateException("id, password can not blank");
     }
   }
 }

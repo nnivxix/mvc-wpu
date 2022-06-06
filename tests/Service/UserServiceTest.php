@@ -8,7 +8,10 @@ use Hanasa\MVC\Exception\ValidateException;
 use Hanasa\MVC\Model\UserRegisterRequest;
 use Hanasa\MVC\Repository\UserRepository;
 use Hanasa\MVC\Domain\User;
+use Hanasa\MVC\Model\UserLoginRequest;
 
+use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertTrue;
 
 class UserServiceTest extends TestCase
 {
@@ -69,5 +72,55 @@ class UserServiceTest extends TestCase
     $request->pswd = "1asaqe2";
 
     $this->userService->register($request);
+  }
+
+  public function testLoginNotFound()
+  {
+    $this->expectException(ValidateException::class);
+
+    // default-nya null
+    $request = new UserLoginRequest();
+    $request->id = "Han";
+    $request->pswd = "han"; 
+
+    $this->userService->login($request);
+
+  }
+
+  public function testLoginWrongPassword()
+  {
+    $user = new User();
+    $user->id = "eksa";
+    $user->name = "eksa";
+    $user->pswd = password_hash("eksa", PASSWORD_BCRYPT);
+
+    $this->expectException(ValidateException::class);
+
+    // default-nya null
+    $request = new UserLoginRequest();
+    $request->id = "Han";
+    $request->pswd = "han"; 
+
+    $this->userService->login($request);
+  }
+
+  public function testLoginSuccess()
+  {
+    $user = new User();
+    $user->id = "eksa";
+    $user->name = "eksa";
+    $user->pswd = password_hash("eksa", PASSWORD_BCRYPT);
+
+    $this->expectException(ValidateException::class);
+
+    // default-nya null
+    $request = new UserLoginRequest();
+    $request->id = "eksa";
+    $request->pswd = "eksa"; 
+
+    $response = $this->userService->login($request);
+
+    self::assertEquals($request->id, $response->user->id);
+    self::assertTrue(password_verify($request->password, $response->user->password));
   }
 }

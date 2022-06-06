@@ -85,5 +85,77 @@ namespace Hanasa\MVC\Controller {
       $this->expectOutputRegex("[Register new User]");
       $this->expectOutputRegex("[User Id sudah ada]");
     }
+
+    public function testLogin()
+    {
+      $this->userController->login();
+
+      $this->expectOutputRegex("[Login user]");
+      $this->expectOutputRegex("[Id]");
+      $this->expectOutputRegex("[Password]");
+    }
+
+    public function testLoginSuccess()
+    {
+      $user = new User();
+      $user->id = "han";
+      $user->name = "hanasa";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+
+      $this->userRepository->save($user);
+
+      $_POST['id'] = "han";
+      $_POST['password'] = "han";
+
+      $this->userController->postLogin();
+
+      $this->expectOutputRegex("[Location: /]");
+    }
+    
+    public function testLoginValidationError()
+    {
+      $_POST['id'] = '';
+      $_POST['password'] = '';
+
+      $this->userController->postLogin();
+
+      $this->expectOutputRegex("[Login user]");
+      $this->expectOutputRegex("[Id]");
+      $this->expectOutputRegex("[Password]");
+      $this->expectOutputRegex("[id, password can not blank]");
+    }
+
+    public function testLoginUserNotFound()
+    {
+      $_POST['id'] = 'notfound';
+      $_POST['password'] = 'notfound';
+
+      $this->userController->postLogin();
+
+      $this->expectOutputRegex("[Login user]");
+      $this->expectOutputRegex("[Id]");
+      $this->expectOutputRegex("[Password]");
+      $this->expectOutputRegex("[Id or password is wrong]");
+    }
+
+    public function testLoginWrongPassword()
+    {
+      $user = new User();
+      $user->id = "han";
+      $user->name = "hanasa";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+
+      $this->userRepository->save($user);
+
+      $_POST['id'] = 'han';
+      $_POST['password'] = 'salah';
+
+      $this->userController->postLogin();
+
+      $this->expectOutputRegex("[Login user]");
+      $this->expectOutputRegex("[Id]");
+      $this->expectOutputRegex("[Password]");
+      $this->expectOutputRegex("[Id or password is wrong]");
+    }
   }
 }
