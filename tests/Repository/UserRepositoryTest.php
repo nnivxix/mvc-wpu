@@ -9,10 +9,22 @@ use Hanasa\MVC\Domain\User;
 class UserRepositoryTest extends TestCase
 {
   private UserRepository $userRepository;
+  private SessionRepository $sessionRepository;
+
   protected function setUp() :void
   {
     $this->userRepository = new UserRepository(Database::getConnection());
+    $this->sessionRepository = new SessionRepository(Database::getConnection());
+
+    $this->sessionRepository->deleteAll();
     $this->userRepository->deleteAll();
+
+    $user = new User();
+    $user->id = "han";
+    $user->name = "Hanasa";
+    $user->pswd = "han";
+
+    $this->userRepository->save($user);
   }
 
   public function testSaveSuccess()
