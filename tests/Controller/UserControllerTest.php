@@ -7,8 +7,9 @@ namespace Hanasa\MVC\App {
   }
 }
 
-namespace Hanasa\MVC\Service{
-  function setcookie(string $name, string $value) {
+namespace Hanasa\MVC\Service {
+  function setcookie(string $name, string $value)
+  {
     echo "$name: $value";
   }
 }
@@ -16,10 +17,12 @@ namespace Hanasa\MVC\Service{
 namespace Hanasa\MVC\Controller {
 
   use Hanasa\MVC\Config\Database;
-  use Hanasa\MVC\Domain\User;
+    use Hanasa\MVC\Domain\Session;
+    use Hanasa\MVC\Domain\User;
   use Hanasa\MVC\Repository\SessionRepository;
   use Hanasa\MVC\Repository\UserRepository;
-  use PHPUnit\Framework\TestCase;
+    use Hanasa\MVC\Service\SessionService;
+    use PHPUnit\Framework\TestCase;
 
   class UserControllerTest extends TestCase
   {
@@ -123,7 +126,7 @@ namespace Hanasa\MVC\Controller {
       $this->expectOutputRegex("[Location: /]");
       $this->expectOutputRegex("[HANASA-SESSION: ]");
     }
-    
+
     public function testLoginValidationError()
     {
       $_POST['id'] = '';
@@ -168,6 +171,31 @@ namespace Hanasa\MVC\Controller {
       $this->expectOutputRegex("[Id]");
       $this->expectOutputRegex("[Password]");
       $this->expectOutputRegex("[Id or password is wrong]");
+    }
+
+    public function testLogout()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = "han";
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      //kemudian panggil untuk logout
+      $this->userController->logout();
+
+      $this->expectOutputRegex("[Location: /]");
+      $this->expectOutputRegex("[HANASA-SESSION: ]");
     }
   }
 }
