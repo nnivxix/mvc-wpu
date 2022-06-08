@@ -7,18 +7,24 @@ use Hanasa\MVC\Config\Database;
 use Hanasa\MVC\Exception\ValidateException;
 use Hanasa\MVC\Model\UserLoginRequest;
 use Hanasa\MVC\Model\UserRegisterRequest;
+use Hanasa\MVC\Repository\SessionRepository;
 use Hanasa\MVC\Repository\UserRepository;
+use Hanasa\MVC\Service\SessionService;
 use Hanasa\MVC\Service\UserService;
 
 class UserController
 {
   private UserService $userService;
+  private SessionService $sessionService;
    
   public function __construct()
   {
     $connection = Database::getConnection();
     $userRepository = new UserRepository($connection);
     $this->userService = new UserService($userRepository);
+
+    $sessionRepository = new SessionRepository($connection);
+    $this->sessionService = new SessionService($sessionRepository, $userRepository);
   }
 
   public function register()
@@ -37,7 +43,8 @@ class UserController
     $request->pswd = $_POST['password'];
     
     try{
-      $this->userService->register($request);
+      $response = $this->userService->register($request);
+      $this->sessionService->create($response->user->id);
       View::redirect('/users/login');
     } catch(ValidateException $exception){
       View::render('User/register', [
@@ -60,12 +67,10 @@ class UserController
     $request->id = $_POST['id'];
     $request->pswd = $_POST['password'];
 
-    
-
     // mari kita cek
-
     try {
-      $this->userService->login($request);
+      $response = $this->userService->login($request);
+      $this->sessionService->create($response->user->id);
       View::redirect('/');
     } catch (ValidateException $exception) {
       View::render('User/login', [

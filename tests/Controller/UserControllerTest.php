@@ -7,10 +7,17 @@ namespace Hanasa\MVC\App {
   }
 }
 
+namespace Hanasa\MVC\Service{
+  function setcookie(string $name, string $value) {
+    echo "$name: $value";
+  }
+}
+
 namespace Hanasa\MVC\Controller {
 
   use Hanasa\MVC\Config\Database;
   use Hanasa\MVC\Domain\User;
+  use Hanasa\MVC\Repository\SessionRepository;
   use Hanasa\MVC\Repository\UserRepository;
   use PHPUnit\Framework\TestCase;
 
@@ -19,10 +26,14 @@ namespace Hanasa\MVC\Controller {
 
     private UserController $userController;
     private UserRepository $userRepository;
+    private SessionRepository $sessionRepository;
 
     protected function setUp(): void
     {
       $this->userController = new UserController();
+
+      $this->sessionRepository = new SessionRepository(Database::getConnection());
+      $this->sessionRepository->deleteAll();
 
       $this->userRepository = new UserRepository(Database::getConnection());
       $this->userRepository->deleteAll();
@@ -110,6 +121,7 @@ namespace Hanasa\MVC\Controller {
       $this->userController->postLogin();
 
       $this->expectOutputRegex("[Location: /]");
+      $this->expectOutputRegex("[HANASA-SESSION: ]");
     }
     
     public function testLoginValidationError()
