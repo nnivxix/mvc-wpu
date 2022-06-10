@@ -9,6 +9,8 @@ use Hanasa\MVC\Model\UserRegisterRequest;
 use Hanasa\MVC\Repository\UserRepository;
 use Hanasa\MVC\Domain\User;
 use Hanasa\MVC\Model\UserLoginRequest;
+use Hanasa\MVC\Model\UserProfileUpdateRequest;
+use Hanasa\MVC\Repository\SessionRepository;
 
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
@@ -17,13 +19,16 @@ class UserServiceTest extends TestCase
 {
   private UserService $userService;
   private UserRepository $userRepository;
+  private SessionRepository $sessionRepository;
 
   protected function setUp() :void
   {
     $connection = Database::getConnection();
     $this->userRepository = new UserRepository($connection);
     $this->userService = new UserService($this->userRepository);
-    
+    $this->sessionRepository = new SessionRepository($connection);
+
+    $this->sessionRepository->deleteAll();
     $this->userRepository->deleteAll();
   }
 
@@ -122,5 +127,54 @@ class UserServiceTest extends TestCase
 
     self::assertEquals($request->id, $response->user->id);
     self::assertTrue(password_verify($request->password, $response->user->password));
+  }
+
+  public function testUpdateSuccess()
+  {
+    $user = new User();
+    $user->id = "eksa";
+    $user->name = "eksa";
+    $user->pswd = password_hash("eksa", PASSWORD_BCRYPT);
+    $this->userRepository->save($user);
+
+    $request = new UserProfileUpdateRequest();
+    // harus sama
+    $request->id = "eksa";
+    $request->name = "new han";
+
+    $this->userService->updateProfile($request);
+
+    $result = $this->userRepository->findById($user->id);
+
+    self::assertEquals($request->name, $result->name);
+  }
+
+  public function testUpdateValidationError()
+  {
+    $this->expectException(ValidateException::class);
+
+    $request = new UserProfileUpdateRequest();
+    $request->id = "";
+    $request->name = "";
+
+    $this->userService->updateProfile($request);
+  }
+
+  public function testUpdateNotFound()
+  {
+    $this->expectException(ValidateException::class);
+
+    $user = new User();
+    $user->id = "eksa";
+    $user->name = "eksa";
+    $user->pswd = password_hash("eksa", PASSWORD_BCRYPT);
+    $this->userRepository->save($user);
+
+    $request = new UserProfileUpdateRequest();
+    // harus beda karena tidak ada yang akan dites.
+    $request->id = "han yu";
+    $request->name = "new han";
+
+    $this->userService->updateProfile($request);
   }
 }

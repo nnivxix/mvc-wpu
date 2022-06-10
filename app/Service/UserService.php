@@ -10,7 +10,8 @@ use Hanasa\MVC\Repository\UserRepository;
 use Hanasa\MVC\Exception\ValidateException;
 use Hanasa\MVC\Model\UserLoginRequest;
 use Hanasa\MVC\Model\UserLoginResponse;
-
+use Hanasa\MVC\Model\UserProfileUpdateRequest;
+use Hanasa\MVC\Model\UserProfileUpdateResponse;
 
 class UserService
 {
@@ -87,6 +88,42 @@ class UserService
     trim($request->id) == "" ||
     trim($request->pswd) == "") {
       throw new ValidateException("id, password can not blank");
+    }
+  }
+
+  public function updateProfile(UserProfileUpdateRequest $request): UserProfileUpdateResponse
+  {
+    $this->validateUserProfileUpdateRequest($request);
+
+    try{
+      Database::beginTransaction();
+
+      $user = $this->userRepository->findById($request->id);
+      if ($user == null){
+        throw new ValidateException("User is not found");
+      }
+
+      $user->name = $request->name;
+      $this->userRepository->update($user);
+
+      Database::commitTransaction();
+
+      $response = new UserProfileUpdateResponse();
+      $response->user = $user;
+      return $response;
+    } catch (\Exception $exception) {
+      Database::rollbackTransaction();
+      throw $exception;
+    }
+  }
+
+  private function validateUserProfileUpdateRequest(UserProfileUpdateRequest $request)
+  {
+    if ($request->id == null ||
+    $request->name == null ||
+    trim($request->id) == "" ||
+    trim($request->name) == "") {
+      throw new ValidateException("id, name can not blank");
     }
   }
 }

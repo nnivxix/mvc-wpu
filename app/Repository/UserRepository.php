@@ -21,6 +21,17 @@ class UserRepository
     ]);
     return $user;
   }
+
+  // ambil domainnya dahulu sebagai parameter
+  public function update(User $user): User
+  {
+    $statement = $this->connection->prepare("UPDATE users SET name = ?, pswd = ? WHERE id = ?");
+    $statement->execute([
+      $user->name, $user->pswd, $user->id
+    ]);
+
+    return $user;
+  }
   
   public function findById(string $id): ?User
   {
