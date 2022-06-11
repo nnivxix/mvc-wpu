@@ -6,6 +6,7 @@ use Hanasa\MVC\App\View;
 use Hanasa\MVC\Config\Database;
 use Hanasa\MVC\Exception\ValidateException;
 use Hanasa\MVC\Model\UserLoginRequest;
+use Hanasa\MVC\Model\UserProfileUpdateRequest;
 use Hanasa\MVC\Model\UserRegisterRequest;
 use Hanasa\MVC\Repository\SessionRepository;
 use Hanasa\MVC\Repository\UserRepository;
@@ -84,5 +85,42 @@ class UserController
   {
     $this->sessionService->destroy();
     View::redirect("/");
+  }
+  public function updateProfile()
+  {
+    $user = $this->sessionService->current();
+    View::render("User/profile", [
+      'title' => 'Update User Profile',
+      'user' => [
+        "id" => $user->id,
+        "name" => $user->name
+      ]
+    ]);
+  }
+
+  public function postUpdateProfile()
+  {
+    $user = $this->sessionService->current();
+
+    // isi form dengan datanya
+    $request = new UserProfileUpdateRequest();
+    $request->id = $user->id;
+    $request->name = $_POST['name'];
+
+    try {
+      // kemudian update
+      $this->userService->updateProfile($request);
+      // jika berhasil maka redirecr ke home ('/')
+      View::redirect('/');
+    } catch (ValidateException $exception) {
+      View::render('User/profile',[
+        'title' => 'Update User Profile',
+        'error' => $exception->getMessage(),
+        'user' => [
+          "id" => $user->id,
+          "name" => $_POST['name']
+        ]
+      ]);
+    }
   }
 }

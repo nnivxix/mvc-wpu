@@ -197,5 +197,85 @@ namespace Hanasa\MVC\Controller {
       $this->expectOutputRegex("[Location: /]");
       $this->expectOutputRegex("[HANASA-SESSION: ]");
     }
+
+    public function testUpdateProfile()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $this->userController->updateProfile();
+
+      $this->expectOutputRegex("[Profile]");
+      $this->expectOutputRegex("[Id]");
+      $this->expectOutputRegex("[Name]");
+    }
+
+    public function testPostUpdateProfileSuccess()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $_POST['name'] = 'Heyyo';
+      $this->userController->postUpdateProfile();
+
+      $this->expectOutputRegex("[Location: /]");
+
+      $result = $this->userRepository->findById("han");
+      self::assertEquals("Heyyo", $result->name);
+    }
+
+    public function testUpdateProfileValidationError()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $_POST['name'] = '';
+      $this->userController->postUpdateProfile();
+
+      $this->expectOutputRegex("[Prfoile]");
+      $this->expectOutputRegex("[Update Profile]");
+      $this->expectOutputRegex("[id, name can not blank]");
+
+
+    }
   }
 }
