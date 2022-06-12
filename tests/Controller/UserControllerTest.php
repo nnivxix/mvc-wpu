@@ -368,7 +368,7 @@ namespace Hanasa\MVC\Controller {
       $this->userRepository->save($user);
 
       // kemudian buatkan sesinya
-      $session = new Session();
+      $session = new Session(); 
       $session->id = uniqid();
       $session->userId = $user->id;
       $this->sessionRepository->save($session);
