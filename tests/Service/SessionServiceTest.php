@@ -8,11 +8,7 @@ use Hanasa\MVC\Domain\Session;
 use Hanasa\MVC\Domain\User;
 use Hanasa\MVC\Repository\SessionRepository;
 use Hanasa\MVC\Repository\UserRepository;
-
-function setcookie(string $name, string $value){
-  echo "$name: $value";
-}
-
+require_once __DIR__ . '/../Helper/helper.php';
 class SessionServiceTest extends TestCase
 {
   private SessionService $sessionService;

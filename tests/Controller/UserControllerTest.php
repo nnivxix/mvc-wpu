@@ -1,28 +1,15 @@
 <?php
-
-namespace Hanasa\MVC\App {
-  function header(string $value)
-  {
-    echo $value;
-  }
-}
-
-namespace Hanasa\MVC\Service {
-  function setcookie(string $name, string $value)
-  {
-    echo "$name: $value";
-  }
-}
-
 namespace Hanasa\MVC\Controller {
 
+  require_once __DIR__ . '/../Helper/helper.php';
+
   use Hanasa\MVC\Config\Database;
-    use Hanasa\MVC\Domain\Session;
-    use Hanasa\MVC\Domain\User;
+  use Hanasa\MVC\Domain\Session;
+  use Hanasa\MVC\Domain\User;
   use Hanasa\MVC\Repository\SessionRepository;
   use Hanasa\MVC\Repository\UserRepository;
-    use Hanasa\MVC\Service\SessionService;
-    use PHPUnit\Framework\TestCase;
+  use Hanasa\MVC\Service\SessionService;
+  use PHPUnit\Framework\TestCase;
 
   class UserControllerTest extends TestCase
   {
@@ -274,8 +261,6 @@ namespace Hanasa\MVC\Controller {
       $this->expectOutputRegex("[Prfoile]");
       $this->expectOutputRegex("[Update Profile]");
       $this->expectOutputRegex("[id, name can not blank]");
-
-
     }
 
     public function testUpdatePassword()
@@ -355,7 +340,6 @@ namespace Hanasa\MVC\Controller {
       $this->expectOutputRegex("[Password]");
       $this->expectOutputRegex("[$user->name]");
       $this->expectOutputRegex("[id, old password and new password can not blank]");
-
     }
 
     public function testPostUpdatePasswordWrongPassword()
@@ -368,7 +352,7 @@ namespace Hanasa\MVC\Controller {
       $this->userRepository->save($user);
 
       // kemudian buatkan sesinya
-      $session = new Session(); 
+      $session = new Session();
       $session->id = uniqid();
       $session->userId = $user->id;
       $this->sessionRepository->save($session);

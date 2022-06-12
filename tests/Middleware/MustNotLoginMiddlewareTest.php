@@ -1,13 +1,8 @@
 <?php
-namespace Hanasa\MVC\App {
-  function header(string $value)
-  {
-    echo $value;
-  }
-}
+
 
 namespace Hanasa\MVC\Middleware{
-
+    require_once __DIR__ . '/../Helper/helper.php';
     use Hanasa\MVC\Config\Database;
     use Hanasa\MVC\Repository\SessionRepository;
     use Hanasa\MVC\Repository\UserRepository;
