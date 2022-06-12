@@ -277,5 +277,112 @@ namespace Hanasa\MVC\Controller {
 
 
     }
+
+    public function testUpdatePassword()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $this->userController->updatePassword();
+
+      $this->expectOutputRegex("[Password]");
+      $this->expectOutputRegex("[$user->name]");
+    }
+
+    public function testPostUpdatePasswordSuccess()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $_POST['oldPassword'] = 'han';
+      $_POST['newPassword'] = '123';
+      $this->userController->postUpdatePassword();
+
+      // kalau benar berarti masuk ke home (/)
+      $this->expectOutputRegex("[Location: /]");
+      $result = $this->userRepository->findById($user->id);
+      self::assertTrue(password_verify("123", $result->pswd));
+    }
+
+    public function testUpdatePasswordValidate()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $_POST['oldPassword'] = '';
+      $_POST['newPassword'] = '';
+      $this->userController->postUpdatePassword();
+
+      $this->expectOutputRegex("[Password]");
+      $this->expectOutputRegex("[$user->name]");
+      $this->expectOutputRegex("[id, old password and new password can not blank]");
+
+    }
+
+    public function testPostUpdatePasswordWrongPassword()
+    {
+      // buat terlebih dahulu
+      $user = new User();
+      $user->id = "han";
+      $user->name = "han";
+      $user->pswd = password_hash("han", PASSWORD_BCRYPT);
+      $this->userRepository->save($user);
+
+      // kemudian buatkan sesinya
+      $session = new Session();
+      $session->id = uniqid();
+      $session->userId = $user->id;
+      $this->sessionRepository->save($session);
+
+      // buat cookie-nya
+      $_COOKIE[SessionService::$COOKIE_NAME] = $session->id;
+
+      $_POST['oldPassword'] = 'yty';
+      $_POST['newPassword'] = '123';
+      $this->userController->postUpdatePassword();
+
+      $this->expectOutputRegex("[Password]");
+      $this->expectOutputRegex("[$user->name]");
+      $this->expectOutputRegex("[Old password is wrong]");
+    }
   }
 }

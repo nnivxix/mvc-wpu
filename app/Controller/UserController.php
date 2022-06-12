@@ -6,6 +6,7 @@ use Hanasa\MVC\App\View;
 use Hanasa\MVC\Config\Database;
 use Hanasa\MVC\Exception\ValidateException;
 use Hanasa\MVC\Model\UserLoginRequest;
+use Hanasa\MVC\Model\UserPasswordUpdateRequest;
 use Hanasa\MVC\Model\UserProfileUpdateRequest;
 use Hanasa\MVC\Model\UserRegisterRequest;
 use Hanasa\MVC\Repository\SessionRepository;
@@ -119,6 +120,39 @@ class UserController
         'user' => [
           "id" => $user->id,
           "name" => $_POST['name']
+        ]
+      ]);
+    }
+  }
+
+  public function updatePassword()
+  {
+    $user = $this->sessionService->current();
+    View::render('User/password', [
+      "title" => "Update password",
+      "user" => [
+        "id" => $user->id
+      ]
+      ]);
+  }
+
+  public function postUpdatePassword()
+  {
+    $user = $this->sessionService->current();
+    $request = new UserPasswordUpdateRequest();
+    $request->id = $user->id;
+    $request->oldPassword = $_POST['oldPassword'];
+    $request->newPassword = $_POST['newPassword'];
+
+    try {
+      $this->userService->updatePassword($request);
+      View::redirect("/");
+    }catch (ValidateException $exception) {
+      View::render('User/password', [
+        "title" => "update Password",
+        "error" => $exception->getMessage(),
+        "user" => [
+          "id" => $user->id
         ]
       ]);
     }

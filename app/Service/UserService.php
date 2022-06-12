@@ -10,6 +10,8 @@ use Hanasa\MVC\Repository\UserRepository;
 use Hanasa\MVC\Exception\ValidateException;
 use Hanasa\MVC\Model\UserLoginRequest;
 use Hanasa\MVC\Model\UserLoginResponse;
+use Hanasa\MVC\Model\UserPasswordUpdateRequest;
+use Hanasa\MVC\Model\UserPasswordUpdateResponse;
 use Hanasa\MVC\Model\UserProfileUpdateRequest;
 use Hanasa\MVC\Model\UserProfileUpdateResponse;
 
@@ -124,6 +126,50 @@ class UserService
     trim($request->id) == "" ||
     trim($request->name) == "") {
       throw new ValidateException("id, name can not blank");
+    }
+  }
+
+  public function updatePassword(UserPasswordUpdateRequest $request ): UserPasswordUpdateResponse
+  {
+    $this->validateUserUpdatePassword($request);
+
+    try {
+      Database::beginTransaction();
+
+      // cari id-nya
+      $user = $this->userRepository->findById($request->id);
+
+      // kemudian cek user-nya ada?
+      if($user == null) {
+        throw new ValidateException("User not found");
+      }
+
+      // kemudian cek password-nya sama?
+      if (!password_verify($request->oldPassword, $user->pswd)){
+        throw new ValidateException("Old password is wrong");
+      }
+
+      // masukan ke id-nya password barunya.
+      $user->pswd = password_hash($request->newPassword, PASSWORD_BCRYPT);
+      $this->userRepository->update($user);
+
+      Database::commitTransaction();
+
+      // lalu kembalikan nilainya
+      $response = new UserPasswordUpdateResponse();
+      $response->user = $user;
+      return $response;
+
+    } catch (\Exception $exception) {
+      Database::rollbackTransaction();
+      throw $exception;
+    }
+  }
+
+  private function validateUserUpdatePassword(UserPasswordUpdateRequest $request)
+  {
+    if ($request->id == null || $request->oldPassword == null || $request->newPassword == null || trim($request->id) == "" || trim($request->oldPassword) == "" || trim($request->newPassword) == "") {
+      throw new ValidateException("id, old password and new password can not blank");
     }
   }
 }
